@@ -8,6 +8,12 @@ namespace GeekShopping.Web.Services
     {
         private readonly HttpClient? _client;
         public const string BasePath = "api/v1/product";
+
+        public ProductService(HttpClient? client)
+        {
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+        }
+
         public async Task<IEnumerable<ProductModel>> FindAllProducts()
         {
             if (_client != null)
@@ -34,19 +40,63 @@ namespace GeekShopping.Web.Services
             }
         }
 
-        public Task<ProductModel> CreateProduct(ProductModel model)
+        public async Task<ProductModel> CreateProduct(ProductModel model)
         {
-            throw new NotImplementedException();
+            if (_client != null)
+            {
+                var response = await _client.PostAsJson(BasePath, model);
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.ReadContentAs<ProductModel>();
+                }
+                else
+                {
+                    throw new Exception("Something went wrong when calling API create");
+                }
+            }
+            else
+            {
+                throw new Exception("something wrong");
+            }
         }
-        public Task<ProductModel> UpdateProduct(ProductModel model)
+        public async Task<ProductModel> UpdateProduct(ProductModel model)
         {
-            throw new NotImplementedException();
+            if (_client != null)
+            {
+                var response = await _client.PutAsJson(BasePath, model);
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.ReadContentAs<ProductModel>();
+                }
+                else
+                {
+                    throw new Exception("Something went wrong when calling API create");
+                }
+            }
+            else
+            {
+                throw new Exception("something wrong");
+            }
         }
 
-        public Task<bool> DeleteProductById(long id)
+        public async Task<bool> DeleteProductById(long id)
         {
-            throw new NotImplementedException();
+            if (_client != null)
+            {
+                var response = await _client.DeleteAsync($"{BasePath}/{id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.ReadContentAs<bool>();
+                }
+                else
+                {
+                    throw new Exception("Something went wrong when calling API delete");
+                }
+            }
+            else
+            {
+                throw new Exception("something wrong");
+            }
         }
-
     }
 }
